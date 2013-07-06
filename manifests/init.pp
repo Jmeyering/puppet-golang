@@ -3,11 +3,11 @@ class golang(
   $tempdir    = "/tmp",
   $version    = "1.1.1",
   $user       = "root",
-  $workspace  = "${user}/go"
+  $gopath  = "/root/go"
 ) {
 
   if $user == 'root' {
-    $profiledir = '/root'
+    $profiledir = '/etc/profile'
   } else {
     $profiledir = "/home/${user}"
   }
@@ -18,8 +18,8 @@ class golang(
     owner  => $user
   } 
 
-  file { "golang-workspace":
-    path => $workspace,
+  file { "golang-gopath":
+    path => $gopath,
     ensure => "directory",
     owner  => $user
   } 
@@ -47,7 +47,7 @@ class golang(
   }
 
   exec { "gowkspc-profile":
-    command => "echo 'export GOPATH=${workspace}' >> ${profiledir}/.profile",
+    command => "echo 'export GOPATH=${gopath}' >> ${profiledir}/.profile",
     path   => [ '/usr/bin', '/bin' ],
     unless => "grep 'GOPATH' ${profiledir}/.profile"
   }
