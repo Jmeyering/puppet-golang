@@ -34,11 +34,12 @@ class golang(
   exec { "extract":
     command => "tar -C ${installdir} -xzf ${tempdir}/go${version}.linux-amd64.tar.gz",
     path    => [ '/usr/bin', '/bin' ],
-    creates => "/usr/local/go",
+    creates => "${installdir}/go",
     user    => $user,
     require => File["golang-dir"]
   }
-  
+
+  # Environment variables
   exec { "goroot-profile":
     command => "echo 'export GOROOT=${installdir}/go' >> ${profiledir}/.profile",
     path   => [ '/usr/bin', '/bin' ],
@@ -58,6 +59,37 @@ class golang(
     unless => "grep '${installdir}/go/bin' ${profiledir}/.profile"
   }
 
+  # Vim Syntax highlighting
+
+  # I might use another module for vim at some point...
+  ensure_resource('file', '.vim', {'ensure' => 'directory',
+                                   'owner' => $user,
+                                   'path' => "/home/${user}/.vim"})
+
+  ensure_resource('file', '.vim/syntax', {'ensure' => 'directory',
+                                   'owner' => $user,
+                                   'path' => "/home/${user}/.vim/syntax",
+                                   'require' => "File[.vim]"})
+
+  ensure_resource('file', '.vim/ftdetect', {'ensure' => 'directory',
+                                   'owner' => $user,
+                                   'path' => "/home/${user}/.vim/ftdetect",
+                                   'require' => "File[.vim]"})
+
+  file {'golang-syntax-filetypes':
+    path    => "/home/${user}/.vim/ftdetect/go.vim",
+    content => 'au BufRead,BufNewFile *.go set filetype=go',
+    owner   => $user,
+    require => File['.vim/ftdetect']
+  }
+
+  file {'golang-syntax':
+    path    => "/home/${user}/.vim/syntax/go.vim",
+    ensure  => link,
+    target  => "${installdir}/go/misc/vim/syntax/go.vim",
+    owner   => $user,
+    require => File['.vim/syntax']
+  }
 }
 
 define download_file(
