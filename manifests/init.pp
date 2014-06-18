@@ -60,6 +60,7 @@ define download_file(
     path => [ '/usr/bin', '/bin' ],
     cwd => $cwd,
     creates => "${cwd}/${name}",
+    unless => "test -f ${cwd}/${name}",
     user => $user,
   }
 }
