@@ -1,7 +1,8 @@
 class golang(
+  $version    = "",
+  $platform    = "linux-amd64",
   $installdir = "/usr/local",
   $tempdir    = "/tmp",
-  $version    = "1.2.2",
   $user       = "root",
   $gopath  = "/root/go"
 ) {
@@ -16,25 +17,24 @@ class golang(
     path => $installdir,
     ensure => "directory",
     owner  => $user
-  } 
+  }
 
   file { "golang-gopath":
     path => $gopath,
     ensure => "directory",
     owner  => $user
-  } 
-
-  download_file { "go${version}":
-    name   => "go${version}.linux-amd64.tar.gz",
-    uri    => "http://golang.org/dl",
-    cwd    => $tempdir,
-    # install as root
-    user   => $user,
-    before => Exec['extract'],
   }
 
-  exec { "extract":
-    command => "tar -C ${installdir} -xzf ${tempdir}/go${version}.linux-amd64.tar.gz",
+  download_file { "go${version}":
+    name   => "go${version}.${platform}.tar.gz",
+    uri    => "http://golang.org/dl",
+    cwd    => $tempdir,
+    user   => $user,
+    before => Exec['golang-extract'],
+  }
+
+  exec { "golang-extract":
+    command => "tar -C ${installdir} -xzf ${tempdir}/go${version}.${platform}.tar.gz",
     path    => [ '/usr/bin', '/bin' ],
     creates => "${installdir}/go",
     user    => $user,
