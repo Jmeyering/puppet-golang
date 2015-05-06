@@ -26,7 +26,7 @@ class golang(
   }
 
   download_file { "go${version}":
-    name   => "go${version}.${platform}.tar.gz",
+    filename   => "go${version}.${platform}.tar.gz",
     uri    => "http://golang.org/dl",
     cwd    => $tempdir,
     user   => $user,
@@ -50,17 +50,17 @@ class golang(
 
 define download_file(
   $uri,
-  $name="",
+  $filename="",
   $cwd="",
   $creates="",
   $user=""
 ) {
-  exec { $name:
-    command => "wget ${uri}/${name}",
+  exec { $filename:
+    command => "wget ${uri}/${filename}",
     path => [ '/usr/bin', '/bin' ],
     cwd => $cwd,
-    creates => "${cwd}/${name}",
-    unless => "test -f ${cwd}/${name}",
+    creates => "${cwd}/${filename}",
+    unless => "test -f ${cwd}/${filename}",
     user => $user,
   }
 }
