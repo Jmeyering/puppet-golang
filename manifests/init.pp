@@ -16,7 +16,7 @@ class golang(
   file { "golang-dir":
     path => $installdir,
     ensure => "directory",
-    owner  => "root"
+    owner  => $user
   }
 
   file { "golang-gopath":
@@ -37,7 +37,7 @@ class golang(
     command => "tar -C ${installdir} -xzf ${tempdir}/go${version}.${platform}.tar.gz",
     path    => [ '/usr/bin', '/bin' ],
     creates => "${installdir}/go",
-    user    => "root",
+    user    => $user,
     require => File["golang-dir"]
   }
 
